@@ -1,9 +1,12 @@
 # Status
 
 - Current milestone: M0
-- Last task: M0.2 follow-up: open issues 1 to 5 settled by Steven (D17 to D21)
+- Last task: M0.2 records fix before merge (D22, IC19 soft hyphens)
 - Next task: M0.3 golden fixture
 
 ## Open issues
 
-1. schema_version stays 1, although this follow-up changed two contract rules: claims.location must be non-empty (D21), and normalize_quote maps four more hyphen characters (D19), which changes segment_hash for text containing them. Standing rule 4 bumps the schema version on contract changes. No v1 file exists yet and the contracts are not merged, so this was treated as still defining version 1. Confirm before M0.3 writes the golden fixture.
+These are for later, not to fix now.
+
+1. QUOTE_NOT_FOUND blocks a correct quote that spans two line-break hyphens of different kinds (a compound such as "self-" then "evident", and a split word such as "con-" then "sequence"), because each check joins or keeps every break at once. It can only block, never pass, a quote. Revisit before OCR sources in the pilot.
+2. episode.budget_cap_usd accepts 0 or a negative value, so BUDGET_CAP_EXCEEDED fires on any spend.
