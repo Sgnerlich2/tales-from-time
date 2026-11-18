@@ -1,0 +1,279 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "CostUsd": {
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "minimum": 0,
+          "title": "Model",
+          "type": "number"
+        },
+        "voice": {
+          "minimum": 0,
+          "title": "Voice",
+          "type": "number"
+        },
+        "assets": {
+          "minimum": 0,
+          "title": "Assets",
+          "type": "number"
+        },
+        "other": {
+          "minimum": 0,
+          "title": "Other",
+          "type": "number"
+        }
+      },
+      "required": [
+        "model",
+        "voice",
+        "assets",
+        "other"
+      ],
+      "title": "CostUsd",
+      "type": "object"
+    },
+    "ErrorLogEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "format": "date-time",
+          "title": "At",
+          "type": "string"
+        },
+        "stage": {
+          "enum": [
+            "topics",
+            "sources",
+            "claims",
+            "script",
+            "verify",
+            "visuals",
+            "assets",
+            "narration",
+            "render",
+            "qa",
+            "package"
+          ],
+          "title": "Stage",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "at",
+        "stage",
+        "message"
+      ],
+      "title": "ErrorLogEntry",
+      "type": "object"
+    },
+    "Gate": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "pending",
+            "approved",
+            "rejected",
+            "skipped"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "approver": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Approver"
+        },
+        "decided_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decided At"
+        }
+      },
+      "required": [
+        "state"
+      ],
+      "title": "Gate",
+      "type": "object"
+    },
+    "Gates": {
+      "additionalProperties": false,
+      "properties": {
+        "topic": {
+          "$ref": "#/$defs/Gate"
+        },
+        "script": {
+          "$ref": "#/$defs/Gate"
+        },
+        "final": {
+          "$ref": "#/$defs/Gate"
+        }
+      },
+      "required": [
+        "topic",
+        "script",
+        "final"
+      ],
+      "title": "Gates",
+      "type": "object"
+    },
+    "StageState": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "pending",
+            "running",
+            "done",
+            "failed",
+            "skipped"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "retries": {
+          "minimum": 0,
+          "title": "Retries",
+          "type": "integer"
+        },
+        "last_error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Error"
+        }
+      },
+      "required": [
+        "status",
+        "retries"
+      ],
+      "title": "StageState",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "episode_id": {
+      "pattern": "^EP-[0-9]{4}$",
+      "title": "Episode Id",
+      "type": "string"
+    },
+    "working_title": {
+      "title": "Working Title",
+      "type": "string"
+    },
+    "current_stage": {
+      "enum": [
+        "topics",
+        "sources",
+        "claims",
+        "script",
+        "verify",
+        "visuals",
+        "assets",
+        "narration",
+        "render",
+        "qa",
+        "package"
+      ],
+      "title": "Current Stage",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "active",
+        "paused_at_gate",
+        "halted_budget",
+        "halted_failure",
+        "done"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "stages": {
+      "additionalProperties": {
+        "$ref": "#/$defs/StageState"
+      },
+      "propertyNames": {
+        "enum": [
+          "topics",
+          "sources",
+          "claims",
+          "script",
+          "verify",
+          "visuals",
+          "assets",
+          "narration",
+          "render",
+          "qa",
+          "package"
+        ]
+      },
+      "title": "Stages",
+      "type": "object"
+    },
+    "gates": {
+      "$ref": "#/$defs/Gates"
+    },
+    "budget_cap_usd": {
+      "default": 10.0,
+      "title": "Budget Cap Usd",
+      "type": "number"
+    },
+    "cost_usd": {
+      "$ref": "#/$defs/CostUsd"
+    },
+    "error_log": {
+      "items": {
+        "$ref": "#/$defs/ErrorLogEntry"
+      },
+      "title": "Error Log",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "episode_id",
+    "working_title",
+    "current_stage",
+    "status",
+    "stages",
+    "gates",
+    "cost_usd",
+    "error_log"
+  ],
+  "title": "Episode",
+  "type": "object"
+}

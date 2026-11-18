@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Segment": {
+      "additionalProperties": false,
+      "properties": {
+        "segment_id": {
+          "pattern": "^SEG-[0-9]{3}$",
+          "title": "Segment Id",
+          "type": "string"
+        },
+        "act": {
+          "maximum": 5,
+          "minimum": 1,
+          "title": "Act",
+          "type": "integer"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "claim_ids": {
+          "items": {
+            "pattern": "^CLM-[0-9]{3}$",
+            "type": "string"
+          },
+          "title": "Claim Ids",
+          "type": "array"
+        },
+        "is_factual": {
+          "title": "Is Factual",
+          "type": "boolean"
+        },
+        "is_quote": {
+          "title": "Is Quote",
+          "type": "boolean"
+        },
+        "voice": {
+          "enum": [
+            "narrator",
+            "quote"
+          ],
+          "title": "Voice",
+          "type": "string"
+        },
+        "text_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Text Hash",
+          "type": "string"
+        },
+        "verified_hash": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verified Hash"
+        },
+        "verification_status": {
+          "enum": [
+            "unverified",
+            "passed",
+            "failed",
+            "flagged"
+          ],
+          "title": "Verification Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "segment_id",
+        "act",
+        "text",
+        "claim_ids",
+        "is_factual",
+        "is_quote",
+        "voice",
+        "text_hash",
+        "verification_status"
+      ],
+      "title": "Segment",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "episode_id": {
+      "pattern": "^EP-[0-9]{4}$",
+      "title": "Episode Id",
+      "type": "string"
+    },
+    "angle": {
+      "title": "Angle",
+      "type": "string"
+    },
+    "title_options": {
+      "items": {
+        "maxLength": 100,
+        "type": "string"
+      },
+      "maxItems": 5,
+      "minItems": 1,
+      "title": "Title Options",
+      "type": "array"
+    },
+    "target_words": {
+      "exclusiveMinimum": 0,
+      "title": "Target Words",
+      "type": "integer"
+    },
+    "segments": {
+      "items": {
+        "$ref": "#/$defs/Segment"
+      },
+      "title": "Segments",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "episode_id",
+    "angle",
+    "title_options",
+    "target_words",
+    "segments"
+  ],
+  "title": "Script",
+  "type": "object"
+}
