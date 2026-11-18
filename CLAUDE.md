@@ -4,6 +4,8 @@
 
 Tales From Time is a local-first pipeline that turns an approved topic into a publish-ready, source-backed history video of about 8 minutes. Each episode is a folder of versioned JSON files; each stage reads its inputs, validates them, and writes validated outputs.
 
+CHARTER.md is the editorial charter Steven approved (purpose, scope, structure, voice, sourcing, release rules). Every model step that pitches, writes, or checks an episode reads it; changing it needs Steven's approval and a record in docs/decisions.md.
+
 ## Roles
 
 - Steven is the owner and final authority.
@@ -25,7 +27,7 @@ uv run tft --help  # show the CLI and its commands
 
 ```text
 tales-from-time/
-  CLAUDE.md, README.md, pyproject.toml, uv.lock, .gitignore, .gitattributes, .env.example
+  CLAUDE.md, CHARTER.md, README.md, pyproject.toml, uv.lock, .gitignore, .gitattributes, .env.example
   docs/              project records: decisions.md (decision log) and status.md (where work stands)
     style/           style guides for script, voice, and visuals
     experiments/     experiment plans and results
@@ -63,7 +65,10 @@ Empty folders hold a .gitkeep file so Git keeps them. Episodes live in TFT_WORKS
 
 ## Records
 
-At the end of every task, update docs/status.md. Record any implementation choice in docs/decisions.md with the label Implementation choice. Do not edit entries labeled Owner confirmed, Recommended, or Assumption; propose changes in the report instead.
+- At the end of every task, update docs/status.md.
+- Record each new implementation choice as a new row in the decision table in docs/decisions.md, with the status Implementation choice.
+- Do not edit entries whose status Steven set: Owner confirmed, Recommended, Assumption, or Deferred by Steven. Propose changes in the report instead.
+- The Changes section of docs/decisions.md logs edits to existing entries, one line per edit: the date, the entry ID, what changed, and who decided.
 
 ## Reporting
 

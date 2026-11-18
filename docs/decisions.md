@@ -24,7 +24,7 @@ Rules for editing this log are in CLAUDE.md under Records.
 | IC2 | uv for Python, environment, and lockfile; pytest; Typer CLI | Implementation choice |
 | IC3 | Pydantic v2 models are the contracts; JSON Schema exported for TypeScript | Implementation choice |
 | IC4 | Python side in native Windows PowerShell, no WSL2; Remotion platform decided at E1 | Implementation choice |
-| IC5 | Episode workspace at TFT_WORKSPACE outside the repo, default C:\tft-workspace on the internal drive; moving to the external SSD later is only a change of TFT_WORKSPACE; workspace/ is the git-ignored fallback | Implementation choice |
+| IC5 | Episode workspace at TFT_WORKSPACE outside the repo, default C:\tft-workspace on the internal drive; moving to the external SSD later is only a change of TFT_WORKSPACE; workspace/ is the git-ignored fallback, used only when TFT_WORKSPACE is empty | Implementation choice |
 | IC6 | Integer schema_version in every contract file, starting at 1 | Implementation choice |
 | IC7 | ID formats EP-0001, SRC-001, CLM-001, SEG-001, SCN-001, AST-001, CG-001 | Implementation choice |
 | IC8 | Quote normalization: NFKC, straight quotes, dashes to hyphen, ellipsis to three dots, line-break hyphenation joined, whitespace collapsed | Implementation choice |
@@ -38,3 +38,5 @@ Rules for editing this log are in CLAUDE.md under Records.
 | IC16 | Build backend uv_build (uv's own backend and its default for new packages) builds package tft from src/tft and installs the tft console script; build-time only, adds no runtime dependency | Implementation choice |
 
 ## Changes
+
+- 2026-11-18, IC5: added that workspace/ is used only when TFT_WORKSPACE is empty. Decided by Steven.
