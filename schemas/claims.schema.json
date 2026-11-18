@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Claim": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "pattern": "^CLM-[0-9]{3}$",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "source_id": {
+          "pattern": "^SRC-[0-9]{3}$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "location": {
+          "title": "Location",
+          "type": "string"
+        },
+        "quote": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Quote",
+          "type": "string"
+        },
+        "evidence_strength": {
+          "enum": [
+            "strong",
+            "moderate",
+            "weak"
+          ],
+          "title": "Evidence Strength",
+          "type": "string"
+        },
+        "conflict_group": {
+          "anyOf": [
+            {
+              "pattern": "^CG-[0-9]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Conflict Group"
+        },
+        "status": {
+          "enum": [
+            "extracted",
+            "verified",
+            "rejected"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "claim_id",
+        "text",
+        "source_id",
+        "location",
+        "quote",
+        "evidence_strength",
+        "status"
+      ],
+      "title": "Claim",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "episode_id": {
+      "pattern": "^EP-[0-9]{4}$",
+      "title": "Episode Id",
+      "type": "string"
+    },
+    "claims": {
+      "items": {
+        "$ref": "#/$defs/Claim"
+      },
+      "title": "Claims",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "episode_id",
+    "claims"
+  ],
+  "title": "Claims",
+  "type": "object"
+}

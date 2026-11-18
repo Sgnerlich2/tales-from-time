@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Asset": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "pattern": "^AST-[0-9]{3}$",
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "path": {
+          "pattern": "^(?:[^/\\\\:.][^/\\\\:]*|\\.[^/\\\\:.][^/\\\\:]*|\\.\\.[^/\\\\:]+)(?:/(?:[^/\\\\:.][^/\\\\:]*|\\.[^/\\\\:.][^/\\\\:]*|\\.\\.[^/\\\\:]+))*$",
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "image",
+            "map_data",
+            "audio",
+            "music",
+            "font",
+            "other"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "source_url": {
+          "title": "Source Url",
+          "type": "string"
+        },
+        "creator": {
+          "title": "Creator",
+          "type": "string"
+        },
+        "archive": {
+          "title": "Archive",
+          "type": "string"
+        },
+        "date": {
+          "title": "Date",
+          "type": "string"
+        },
+        "original_status": {
+          "enum": [
+            "public_domain",
+            "cc0",
+            "cc_by",
+            "cc_by_sa",
+            "licensed",
+            "unknown"
+          ],
+          "title": "Original Status",
+          "type": "string"
+        },
+        "reproduction_license": {
+          "title": "Reproduction License",
+          "type": "string"
+        },
+        "attribution": {
+          "title": "Attribution",
+          "type": "string"
+        },
+        "rights_status": {
+          "enum": [
+            "cleared",
+            "unresolved",
+            "missing"
+          ],
+          "title": "Rights Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "asset_id",
+        "path",
+        "sha256",
+        "kind",
+        "source_url",
+        "creator",
+        "archive",
+        "date",
+        "original_status",
+        "reproduction_license",
+        "attribution",
+        "rights_status"
+      ],
+      "title": "Asset",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "episode_id": {
+      "pattern": "^EP-[0-9]{4}$",
+      "title": "Episode Id",
+      "type": "string"
+    },
+    "assets": {
+      "items": {
+        "$ref": "#/$defs/Asset"
+      },
+      "title": "Assets",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "episode_id",
+    "assets"
+  ],
+  "title": "Assets",
+  "type": "object"
+}

@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "pattern": "^SRC-[0-9]{3}$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "author": {
+          "title": "Author",
+          "type": "string"
+        },
+        "date": {
+          "pattern": "^[0-9]{4}(?:-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12][0-9]|3[01]))?)?$",
+          "title": "Date",
+          "type": "string"
+        },
+        "tier": {
+          "enum": [
+            "primary",
+            "scholarly"
+          ],
+          "title": "Tier",
+          "type": "string"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "local_path": {
+          "pattern": "^(?:[^/\\\\:.][^/\\\\:]*|\\.[^/\\\\:.][^/\\\\:]*|\\.\\.[^/\\\\:]+)(?:/(?:[^/\\\\:.][^/\\\\:]*|\\.[^/\\\\:.][^/\\\\:]*|\\.\\.[^/\\\\:]+))*$",
+          "title": "Local Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "text_path": {
+          "pattern": "^(?:[^/\\\\:.][^/\\\\:]*|\\.[^/\\\\:.][^/\\\\:]*|\\.\\.[^/\\\\:]+)(?:/(?:[^/\\\\:.][^/\\\\:]*|\\.[^/\\\\:.][^/\\\\:]*|\\.\\.[^/\\\\:]+))*$",
+          "title": "Text Path",
+          "type": "string"
+        },
+        "text_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Text Sha256",
+          "type": "string"
+        },
+        "retrieved": {
+          "format": "date",
+          "title": "Retrieved",
+          "type": "string"
+        },
+        "bias_note": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Bias Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "title",
+        "author",
+        "date",
+        "tier",
+        "url",
+        "local_path",
+        "sha256",
+        "text_path",
+        "text_sha256",
+        "retrieved",
+        "bias_note"
+      ],
+      "title": "Source",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "episode_id": {
+      "pattern": "^EP-[0-9]{4}$",
+      "title": "Episode Id",
+      "type": "string"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/Source"
+      },
+      "title": "Sources",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "episode_id",
+    "sources"
+  ],
+  "title": "Sources",
+  "type": "object"
+}

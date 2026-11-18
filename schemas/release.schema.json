@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Chapter": {
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "pattern": "^(?:[0-5]?[0-9]:[0-5][0-9]|[0-9]+:[0-5][0-9]:[0-5][0-9])$",
+          "title": "Start",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "title"
+      ],
+      "title": "Chapter",
+      "type": "object"
+    },
+    "QaSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "hard_failures": {
+          "minimum": 0,
+          "title": "Hard Failures",
+          "type": "integer"
+        },
+        "warnings": {
+          "minimum": 0,
+          "title": "Warnings",
+          "type": "integer"
+        },
+        "report_path": {
+          "pattern": "^(?:[^/\\\\:.][^/\\\\:]*|\\.[^/\\\\:.][^/\\\\:]*|\\.\\.[^/\\\\:]+)(?:/(?:[^/\\\\:.][^/\\\\:]*|\\.[^/\\\\:.][^/\\\\:]*|\\.\\.[^/\\\\:]+))*$",
+          "title": "Report Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "hard_failures",
+        "warnings",
+        "report_path"
+      ],
+      "title": "QaSummary",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "episode_id": {
+      "pattern": "^EP-[0-9]{4}$",
+      "title": "Episode Id",
+      "type": "string"
+    },
+    "video_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Video Sha256"
+    },
+    "loudness_lufs": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Loudness Lufs"
+    },
+    "true_peak_dbtp": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "True Peak Dbtp"
+    },
+    "qa": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/QaSummary"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "description": {
+      "title": "Description",
+      "type": "string"
+    },
+    "chapters": {
+      "items": {
+        "$ref": "#/$defs/Chapter"
+      },
+      "title": "Chapters",
+      "type": "array"
+    },
+    "captions_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Captions Sha256"
+    },
+    "synthetic_disclosure": {
+      "const": true,
+      "title": "Synthetic Disclosure",
+      "type": "boolean"
+    },
+    "visibility": {
+      "const": "private",
+      "title": "Visibility",
+      "type": "string"
+    },
+    "approver": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Approver"
+    },
+    "approved_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Approved At"
+    },
+    "youtube_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Youtube Id"
+    }
+  },
+  "required": [
+    "schema_version",
+    "episode_id",
+    "title",
+    "description",
+    "chapters",
+    "synthetic_disclosure",
+    "visibility"
+  ],
+  "title": "Release",
+  "type": "object"
+}

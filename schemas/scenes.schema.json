@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Scene": {
+      "additionalProperties": false,
+      "properties": {
+        "scene_id": {
+          "pattern": "^SCN-[0-9]{3}$",
+          "title": "Scene Id",
+          "type": "string"
+        },
+        "segment_id": {
+          "pattern": "^SEG-[0-9]{3}$",
+          "title": "Segment Id",
+          "type": "string"
+        },
+        "segment_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Segment Hash",
+          "type": "string"
+        },
+        "component": {
+          "enum": [
+            "map_zoom",
+            "document_quote",
+            "archival_pan",
+            "chapter_card",
+            "timeline"
+          ],
+          "title": "Component",
+          "type": "string"
+        },
+        "props": {
+          "additionalProperties": true,
+          "title": "Props",
+          "type": "object"
+        },
+        "asset_ids": {
+          "items": {
+            "pattern": "^AST-[0-9]{3}$",
+            "type": "string"
+          },
+          "title": "Asset Ids",
+          "type": "array"
+        },
+        "citation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Citation"
+        },
+        "motion": {
+          "enum": [
+            "static",
+            "animated"
+          ],
+          "title": "Motion",
+          "type": "string"
+        },
+        "start_s": {
+          "minimum": 0,
+          "title": "Start S",
+          "type": "number"
+        },
+        "duration_s": {
+          "exclusiveMinimum": 0,
+          "title": "Duration S",
+          "type": "number"
+        }
+      },
+      "required": [
+        "scene_id",
+        "segment_id",
+        "segment_hash",
+        "component",
+        "props",
+        "asset_ids",
+        "motion",
+        "start_s",
+        "duration_s"
+      ],
+      "title": "Scene",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "episode_id": {
+      "pattern": "^EP-[0-9]{4}$",
+      "title": "Episode Id",
+      "type": "string"
+    },
+    "scenes": {
+      "items": {
+        "$ref": "#/$defs/Scene"
+      },
+      "title": "Scenes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "episode_id",
+    "scenes"
+  ],
+  "title": "Scenes",
+  "type": "object"
+}
