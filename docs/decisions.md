@@ -27,7 +27,7 @@ Rules for editing this log are in CLAUDE.md under Records.
 | IC5 | Episode workspace at TFT_WORKSPACE outside the repo, default C:\tft-workspace on the internal drive; moving to the external SSD later is only a change of TFT_WORKSPACE; workspace/ is the git-ignored fallback, used only when TFT_WORKSPACE is empty | Implementation choice |
 | IC6 | Integer schema_version in every contract file, starting at 1 | Implementation choice |
 | IC7 | ID formats EP-0001, SRC-001, CLM-001, SEG-001, SCN-001, AST-001, CG-001 | Implementation choice |
-| IC8 | Quote normalization: NFKC, straight quotes, dashes to hyphen, ellipsis to three dots, line-break hyphenation joined, whitespace collapsed | Implementation choice |
+| IC8 | Quote normalization: straight quotes, dashes to hyphen, ellipsis to three dots, line-break hyphenation joined, whitespace collapsed; no NFKC or other Unicode normalization, so the charter's word-for-word rule holds (for example 10² never matches 102) | Implementation choice |
 | IC9 | Segment hash: SHA-256 of normalized text, newline, sorted claim IDs joined by commas | Implementation choice |
 | IC10 | JSON paths relative with forward slashes; text UTF-8 with LF via .gitattributes | Implementation choice |
 | IC11 | Golden fixture uses invented, labeled documents, never real history | Implementation choice |
@@ -40,3 +40,4 @@ Rules for editing this log are in CLAUDE.md under Records.
 ## Changes
 
 - 2026-11-18, IC5: added that workspace/ is used only when TFT_WORKSPACE is empty. Decided by Steven.
+- 2026-11-18, IC8: NFKC removed to match CHARTER.md quote rule. Decided by Steven.
