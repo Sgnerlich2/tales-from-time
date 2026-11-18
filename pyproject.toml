@@ -1,0 +1,29 @@
+[project]
+name = "tales-from-time"
+version = "0.1.0"
+description = "Local-first pipeline that turns an approved topic into a source-backed history video."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "pydantic>=2,<3",
+    "typer",
+]
+
+[project.scripts]
+tft = "tft.cli:app"
+
+[dependency-groups]
+dev = [
+    "pytest",
+]
+
+[build-system]
+requires = ["uv_build>=0.13.7,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "tft"
+module-root = "src"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

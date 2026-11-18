@@ -1,0 +1,27 @@
+# Secrets: real keys live only in .env, which is never committed.
+.env
+.env.*
+!.env.example
+
+# Fallback episode workspace: keep the folder, ignore everything in it.
+/workspace/*
+!/workspace/.gitkeep
+
+# Python
+.venv/
+__pycache__/
+.pytest_cache/
+
+# Remotion render project
+render/node_modules/
+render/out/
+
+# Media files, anywhere in the tree
+*.mp4
+*.wav
+*.mp3
+
+# OS files
+Thumbs.db
+desktop.ini
+.DS_Store

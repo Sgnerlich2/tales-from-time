@@ -1,0 +1,8 @@
+# Store and check out text with LF line endings. Source copies and fixtures are
+# hashed, and Windows line-ending conversion would change their hashes.
+* text=auto eol=lf
+
+# Binary files: never convert line endings.
+*.png binary
+*.jpg binary
+*.pdf binary
