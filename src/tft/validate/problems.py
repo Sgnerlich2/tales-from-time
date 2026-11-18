@@ -2,8 +2,11 @@
 
 from dataclasses import dataclass
 
-# The M0.2 rule table, in table order. Output within a file is sorted in this order.
+# The M0.2 rule table, in table order, plus the follow-up codes (D18, D20). Output within
+# a file is sorted in this order.
 RULE_CODES: tuple[str, ...] = (
+    "EPISODE_FILE_MISSING",
+    "UPSTREAM_FILE_MISSING",
     "SCHEMA_INVALID",
     "DUPLICATE_ID",
     "RETRY_LIMIT_EXCEEDED",
@@ -15,6 +18,7 @@ RULE_CODES: tuple[str, ...] = (
     "QUOTE_NOT_FOUND",
     "LONE_CONFLICT_GROUP",
     "UNKNOWN_CLAIM",
+    "REJECTED_CLAIM_CITED",
     "UNCITED_FACTUAL_SEGMENT",
     "QUOTE_MISMATCH",
     "QUOTE_VOICE_MISMATCH",

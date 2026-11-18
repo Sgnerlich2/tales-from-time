@@ -24,6 +24,19 @@ def test_normalize_quote_maps_dashes_and_the_ellipsis():
     assert normalize_quote("1901–1902 — a − b…") == "1901-1902 - a - b..."
 
 
+@pytest.mark.parametrize("dash", ["‐", "‑", "‒", "―"], ids=["hyphen", "nb-hyphen", "figure", "bar"])
+def test_normalize_quote_maps_other_hyphen_characters_to_a_plain_hyphen(dash):
+    assert normalize_quote(f"well{dash}known") == "well-known"
+    assert normalize_quote(f"well{dash}\nknown") == "wellknown"
+    assert normalize_quote(f"well{dash}\nknown", keep_linebreak_hyphen=True) == "well-known"
+
+
+def test_normalize_quote_leaves_a_line_break_hyphen_between_digits_unjoined():
+    for text in ("1914-\n1918", "1914–\n1918", "1914‐\n1918"):
+        assert normalize_quote(text) == "1914- 1918"
+        assert normalize_quote(text, keep_linebreak_hyphen=True) == "1914- 1918"
+
+
 def test_normalize_quote_removes_soft_hyphens():
     assert normalize_quote("well­known") == "wellknown"
 
@@ -78,6 +91,7 @@ def test_quote_with_102_does_not_match_a_source_with_10_squared():
 
 def test_source_with_well_at_a_line_end_matches_a_quote_reading_well_known():
     assert quote_in_text("the well-known captain ordered the engines full astern", SOURCE)
+    assert quote_in_text("the well‑known captain", SOURCE)  # non-breaking hyphen in the quote
 
 
 def test_quote_that_normalizes_to_nothing_never_matches():

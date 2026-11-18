@@ -30,6 +30,42 @@ MIN_SOURCES_PER_TIER = 2
 MIN_CHAPTERS = 3
 MIN_CHAPTER_GAP_S = 10
 
+# The contract files each file needs before it, following the stage order in episode.json
+# (sources, claims, script, visuals for scenes.json, assets, then package for release.json).
+# episode.json comes first of all and has its own rule, EPISODE_FILE_MISSING (IC23).
+UPSTREAM_FILES: dict[str, tuple[str, ...]] = {
+    "sources": (),
+    "claims": ("sources",),
+    "script": ("sources", "claims"),
+    "scenes": ("sources", "claims", "script"),
+    "assets": ("sources", "claims", "script", "scenes"),
+    "release": ("sources", "claims", "script", "scenes", "assets"),
+}
+
+
+def episode_file_missing(present: frozenset[str]) -> list[Problem]:
+    """EPISODE_FILE_MISSING: the episode folder has no episode.json (D20)."""
+    if "episode" in present:
+        return []
+    return [Problem("episode.json", "-", "EPISODE_FILE_MISSING", "the episode folder has no episode.json")]
+
+
+def upstream_file_missing(present: frozenset[str]) -> list[Problem]:
+    """UPSTREAM_FILE_MISSING: a contract file is present but a file before it in the stage
+    order is missing (D20). One problem per present file and missing upstream file."""
+    return [
+        Problem(
+            f"{contract}.json",
+            "-",
+            "UPSTREAM_FILE_MISSING",
+            f"{contract}.json needs {upstream}.json, which is missing",
+        )
+        for contract, upstreams in UPSTREAM_FILES.items()
+        if contract in present
+        for upstream in upstreams
+        if upstream not in present
+    ]
+
 
 def duplicate_ids(contract: str, model: BaseModel) -> list[Problem]:
     """DUPLICATE_ID: an ID repeats within a file. One problem per repeated ID."""
@@ -139,12 +175,12 @@ def insufficient_sources(sources: Sources, script_present: bool) -> list[Problem
 
 
 def unknown_source(claims: Claims, sources: Sources) -> list[Problem]:
-    """UNKNOWN_SOURCE: source_id is not in sources.json."""
+    """UNKNOWN_SOURCE: source_id is not in sources.json. Rejected claims are skipped (D18)."""
     known = {s.source_id for s in sources.sources}
     return [
         Problem("claims.json", c.claim_id, "UNKNOWN_SOURCE", f"source_id {c.source_id} is not in sources.json")
         for c in claims.claims
-        if c.source_id not in known
+        if c.status != "rejected" and c.source_id not in known
     ]
 
 
@@ -157,14 +193,16 @@ def quote_not_found(
     """QUOTE_NOT_FOUND: the normalized quote is not a substring of the normalized text_path
     file, checked with line-break hyphens joined and with them kept; either way passes.
 
-    Claims with an unknown source or a missing text file are skipped (UNKNOWN_SOURCE and
-    SOURCE_FILE_MISSING report those). A text file that is not valid UTF-8 cannot be
-    searched, so its claims fail.
+    Rejected claims are skipped (D18). Claims with an unknown source or a missing text file
+    are skipped too (UNKNOWN_SOURCE and SOURCE_FILE_MISSING report those). A text file that
+    is not valid UTF-8 cannot be searched, so its claims fail.
     """
     by_id = {s.source_id: s for s in sources.sources}
     haystacks: dict[str, NormalizedText] = {}
     problems = []
     for claim in claims.claims:
+        if claim.status == "rejected":
+            continue
         source = by_id.get(claim.source_id)
         if source is None or not files[source.text_path].ok:
             continue
@@ -194,10 +232,13 @@ def quote_not_found(
 
 
 def lone_conflict_group(claims: Claims) -> list[Problem]:
-    """LONE_CONFLICT_GROUP: a conflict group has fewer than 2 claims."""
+    """LONE_CONFLICT_GROUP: a conflict group has fewer than 2 claims. Rejected claims are
+    skipped and do not count toward a group's two (D18)."""
     members: dict[str, list[str]] = defaultdict(list)
     for claim in claims.claims:
-        if claim.conflict_group is not None and claim.claim_id not in members[claim.conflict_group]:
+        if claim.status == "rejected" or claim.conflict_group is None:
+            continue
+        if claim.claim_id not in members[claim.conflict_group]:
             members[claim.conflict_group].append(claim.claim_id)
     return [
         Problem(
@@ -219,6 +260,18 @@ def unknown_claim(script: Script, claims: Claims) -> list[Problem]:
         for segment in script.segments
         for claim_id in segment.claim_ids
         if claim_id not in known
+    ]
+
+
+def rejected_claim_cited(script: Script, claims: Claims) -> list[Problem]:
+    """REJECTED_CLAIM_CITED: a script segment cites a claim whose status is rejected (D18).
+    Rejected claims stay in claims.json as a record, but nothing may cite them."""
+    rejected = {c.claim_id for c in claims.claims if c.status == "rejected"}
+    return [
+        Problem("script.json", segment.segment_id, "REJECTED_CLAIM_CITED", f"cites {claim_id}, which is rejected")
+        for segment in script.segments
+        for claim_id in segment.claim_ids
+        if claim_id in rejected
     ]
 
 

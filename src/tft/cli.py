@@ -46,8 +46,9 @@ def main(
 def validate(path: Annotated[str, typer.Argument(help="An episode folder or one contract file.")]) -> None:
     """Check an episode folder, or one contract file, against the contracts and rules.
 
-    A folder gets every rule whose files are present. A single file gets the schema rules
-    only (SCHEMA_INVALID and DUPLICATE_ID). Exit code 0 means PASS, 1 FAIL, 2 bad path.
+    A folder gets every rule whose files are present, and fails without episode.json or with
+    a later file whose upstream file is missing. A single file gets every rule that needs
+    only that file. Exit code 0 means PASS, 1 FAIL, 2 bad path.
     """
     target = Path(path)
     if not target.exists():

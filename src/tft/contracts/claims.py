@@ -17,7 +17,7 @@ class Claim(ContractModel):
     claim_id: ClaimId
     text: str
     source_id: SourceId
-    location: str
+    location: NonEmptyStr  # CHARTER.md: every claim carries its page or location
     quote: NonEmptyStr
     evidence_strength: Literal["strong", "moderate", "weak"]
     conflict_group: ConflictGroupId | None = None

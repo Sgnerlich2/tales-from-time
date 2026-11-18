@@ -19,6 +19,8 @@
           "type": "string"
         },
         "location": {
+          "minLength": 1,
+          "pattern": "\\S",
           "title": "Location",
           "type": "string"
         },

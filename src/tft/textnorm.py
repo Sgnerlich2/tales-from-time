@@ -21,9 +21,14 @@ _CHARACTER_MAP = str.maketrans(
         "”": '"',
         "„": '"',
         "‟": '"',
-        # En dash, em dash, and minus sign to a hyphen.
+        # Hyphen, non-breaking hyphen, figure dash, en dash, em dash, horizontal bar, and
+        # minus sign to a plain hyphen.
+        "‐": "-",
+        "‑": "-",
+        "‒": "-",
         "–": "-",
         "—": "-",
+        "―": "-",
         "−": "-",
         # The ellipsis character to three dots.
         "…": "...",
@@ -33,7 +38,8 @@ _CHARACTER_MAP = str.maketrans(
 )
 
 # A hyphen at a line break (LF, CRLF, or CR) between two letters. Spaces or tabs on either
-# side of the line break count as part of it. Letters are Unicode letters.
+# side of the line break count as part of it. Letters are Unicode letters; a hyphen at a
+# line break between digits is left alone, because it is often a range such as 1914-1918.
 _LETTER = r"[^\W\d_]"
 _LINE_BREAK_HYPHEN = re.compile(rf"(?<={_LETTER})-[^\S\r\n]*(?:\r\n|\r|\n)[^\S\r\n]*(?={_LETTER})")
 _WHITESPACE_RUN = re.compile(r"\s+")
@@ -42,9 +48,10 @@ _WHITESPACE_RUN = re.compile(r"\s+")
 def normalize_quote(text: str, keep_linebreak_hyphen: bool = False) -> str:
     """Normalize quote or source text for comparison.
 
-    Curly quotes become straight, en dash, em dash, and minus sign become a hyphen, the
-    ellipsis character becomes three dots, and soft hyphens are removed. A hyphen at a line
-    break between two letters is joined ("well-\\nknown" becomes "wellknown"), or with
+    Curly quotes become straight; hyphen-like dashes (U+2010 to U+2015 and the minus sign)
+    become a plain hyphen; the ellipsis character becomes three dots; soft hyphens are
+    removed. A hyphen at a line break between two letters is joined ("well-\\nknown" becomes
+    "wellknown"), or with
     keep_linebreak_hyphen=True only the line break goes ("well-known"). Every whitespace run
     becomes one space and the ends are stripped. Case and wording stay unchanged.
     """

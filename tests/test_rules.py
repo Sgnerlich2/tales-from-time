@@ -28,6 +28,82 @@ def test_baseline_episode_passes_every_rule(episode):
     episode.passes()
 
 
+# EPISODE_FILE_MISSING
+
+
+def test_episode_file_missing_passes_with_episode_json(episode):
+    assert episode.path("episode.json").is_file()
+    episode.passes()
+
+
+def test_episode_file_missing_fails_without_episode_json(episode):
+    episode.path("episode.json").unlink()
+    problems = episode.only("EPISODE_FILE_MISSING")
+    assert [(p.file, p.item_id, p.message) for p in problems] == [
+        ("episode.json", "-", "the episode folder has no episode.json")
+    ]
+
+
+def test_episode_file_missing_fails_for_an_empty_folder(tmp_path):
+    report = validate_folder(tmp_path)
+    assert (report.files, [p.code for p in report.problems]) == (0, ["EPISODE_FILE_MISSING"])
+
+
+# UPSTREAM_FILE_MISSING
+
+
+@pytest.mark.parametrize(
+    "removed",
+    [(), ("release.json",), ("assets.json", "release.json"), ("claims.json", "script.json", "scenes.json", "assets.json", "release.json")],
+    ids=["all-files", "no-release", "up-to-scenes", "episode-and-sources-only"],
+)
+def test_upstream_file_missing_passes_when_files_stop_at_a_stage(episode, removed):
+    for name in removed:
+        episode.path(name).unlink()
+    episode.passes()
+
+
+@pytest.mark.parametrize(
+    ("removed", "expected"),
+    [
+        (
+            "sources.json",
+            [
+                ("claims.json", "claims.json needs sources.json, which is missing"),
+                ("script.json", "script.json needs sources.json, which is missing"),
+                ("scenes.json", "scenes.json needs sources.json, which is missing"),
+                ("assets.json", "assets.json needs sources.json, which is missing"),
+                ("release.json", "release.json needs sources.json, which is missing"),
+            ],
+        ),
+        (
+            "claims.json",
+            [
+                ("script.json", "script.json needs claims.json, which is missing"),
+                ("scenes.json", "scenes.json needs claims.json, which is missing"),
+                ("assets.json", "assets.json needs claims.json, which is missing"),
+                ("release.json", "release.json needs claims.json, which is missing"),
+            ],
+        ),
+        ("assets.json", [("release.json", "release.json needs assets.json, which is missing")]),
+    ],
+)
+def test_upstream_file_missing_fails_and_names_both_files(episode, removed, expected):
+    episode.path(removed).unlink()
+    problems = episode.only("UPSTREAM_FILE_MISSING")
+    assert [(p.file, p.message) for p in problems] == expected
+
+
+def test_upstream_file_missing_fails_for_a_script_without_sources_or_claims(episode):
+    for name in ("sources.json", "claims.json", "scenes.json", "assets.json", "release.json"):
+        episode.path(name).unlink()
+    problems = episode.only("UPSTREAM_FILE_MISSING")
+    assert [p.message for p in problems] == [
+        "script.json needs sources.json, which is missing",
+        "script.json needs claims.json, which is missing",
+    ]
+
+
 # SCHEMA_INVALID
 
 
@@ -57,6 +133,8 @@ def test_schema_invalid_fails_without_episode_id(episode, name):
         ("claims.json", "CLM-002", {"quote": "  "}, "claims[1].quote: String should match pattern"),
         ("claims.json", "CLM-003", {"conflict_group": "CG-1"}, "claims[2].conflict_group: String should match pattern"),
         ("claims.json", "CLM-001", {"claim_id": "CLM-0001"}, "claims[0].claim_id: String should match pattern"),
+        ("claims.json", "CLM-004", {"location": ""}, "claims[3].location: String should have at least 1 character"),
+        ("claims.json", "CLM-005", {"location": "  "}, "claims[4].location: String should match pattern"),
         (
             "sources.json",
             "SRC-001",
@@ -263,7 +341,8 @@ def test_insufficient_sources_passes_with_two_of_each_tier(episode):
 
 def test_insufficient_sources_passes_without_a_script(episode):
     episode.update("sources.json", "SRC-002", tier="scholarly")
-    episode.path("script.json").unlink()
+    for name in ("script.json", "scenes.json", "assets.json", "release.json"):  # script.json and what follows it
+        episode.path(name).unlink()
     episode.passes()
 
 
@@ -277,6 +356,11 @@ def test_insufficient_sources_fails_with_one_source_in_a_tier(episode, source_id
 
 
 def test_unknown_source_passes_when_every_source_is_known(episode):
+    episode.passes()
+
+
+def test_unknown_source_passes_for_a_rejected_claim(episode):
+    episode.update("claims.json", "CLM-002", source_id="SRC-009", status="rejected")
     episode.passes()
 
 
@@ -297,6 +381,11 @@ def test_quote_not_found_passes_despite_curly_quotes_hyphenation_and_spacing(epi
 
 def test_quote_not_found_passes_for_a_superscript_quoted_as_written(episode):
     episode.update("claims.json", "CLM-005", quote="The floe lay 10² yards off the bow.")
+    episode.passes()
+
+
+def test_quote_not_found_passes_for_a_rejected_claim(episode):
+    episode.update("claims.json", "CLM-002", quote="the steamer Example arrived at 4:25 a.m.", status="rejected")
     episode.passes()
 
 
@@ -334,6 +423,24 @@ def test_lone_conflict_group_fails_with_one_claim_in_the_group(episode):
     ]
 
 
+# CLM-002 and CLM-005 are cited by no segment, so rejecting them cannot trip REJECTED_CLAIM_CITED.
+
+
+def test_lone_conflict_group_passes_when_every_claim_in_a_group_is_rejected(episode):
+    episode.update("claims.json", "CLM-002", conflict_group="CG-002", status="rejected")
+    episode.update("claims.json", "CLM-005", conflict_group="CG-002", status="rejected")
+    episode.passes()
+
+
+def test_lone_conflict_group_fails_when_a_rejected_claim_leaves_one(episode):
+    episode.update("claims.json", "CLM-002", conflict_group="CG-002")
+    episode.update("claims.json", "CLM-005", conflict_group="CG-002", status="rejected")
+    problems = episode.only("LONE_CONFLICT_GROUP")
+    assert [(p.item_id, p.message) for p in problems] == [
+        ("CG-002", "conflict group CG-002 has only 1 claim (CLM-002); a group needs at least 2")
+    ]
+
+
 # UNKNOWN_CLAIM
 
 
@@ -346,6 +453,23 @@ def test_unknown_claim_fails_for_a_claim_not_in_claims_json(episode):
     episode.rehash("SEG-004")
     problems = episode.only("UNKNOWN_CLAIM")
     assert [(p.item_id, p.message) for p in problems] == [("SEG-004", "claim CLM-009 is not in claims.json")]
+
+
+# REJECTED_CLAIM_CITED
+
+
+def test_rejected_claim_cited_passes_for_a_rejected_claim_no_segment_cites(episode):
+    episode.update("claims.json", "CLM-005", status="rejected")  # stays in claims.json as a record
+    episode.passes()
+
+
+def test_rejected_claim_cited_fails_when_a_segment_cites_a_rejected_claim(episode):
+    episode.update("claims.json", "CLM-001", status="rejected")
+    problems = episode.only("REJECTED_CLAIM_CITED")
+    assert [(p.file, p.item_id, p.message) for p in problems] == [
+        ("script.json", "SEG-002", "cites CLM-001, which is rejected"),
+        ("script.json", "SEG-003", "cites CLM-001, which is rejected"),
+    ]
 
 
 # UNCITED_FACTUAL_SEGMENT
